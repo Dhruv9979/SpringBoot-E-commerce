@@ -1,14 +1,11 @@
 package com.Springboot.E_commerce.controllers;
 
 import com.Springboot.E_commerce.model.Product;
-import com.Springboot.E_commerce.services.ProductsService;
+import com.Springboot.E_commerce.services.IProductsService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -16,9 +13,9 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProductController {
 
-    private ProductsService service;
+    private IProductsService service;
 
-    public ProductController(ProductsService service) {
+    public ProductController(IProductsService service) {
         this.service = service;
     }
 
@@ -36,35 +33,29 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-
-    @GetMapping("/products/{productId}/image")
-    public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId) {
-        Product product = service.getProductById(productId);
-        byte[] imageFile = product.getImageData();
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(product.getImageType()))
-                .body(imageFile);
-    }
-
     @PostMapping("/products")
-    public ResponseEntity<?> addProduct(@RequestPart Product product, @RequestPart MultipartFile imageFile) {
+    public ResponseEntity<String> addProduct(@RequestBody Product product) {
+        int newProductId;
         try {
-            Product newProduct = service.addProduct(product, imageFile);
-            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+            newProductId = service.addProduct(product);
         } catch(Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        if(newProductId != 0)
+            return new ResponseEntity<>("Created", HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>("Bad Request", HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/products/{productId}")
-    public ResponseEntity<String> updateProduct(@PathVariable int productId, @RequestPart Product product, @RequestPart MultipartFile imageFile) {
-        Product updateProduct = null;
+    public ResponseEntity<String> updateProduct(@PathVariable int productId, @RequestBody Product product) {
+        int updateProductId;
         try {
-            updateProduct = service.updateProduct(productId, product, imageFile);
-        } catch (IOException e) {
+            updateProductId = service.updateProduct(productId, product);
+        } catch (Exception e) {
             return new ResponseEntity<>("Failed to Update", HttpStatus.BAD_REQUEST);
         }
-        if(updateProduct != null)
+        if(updateProductId != 0)
             return new ResponseEntity<>("Updated", HttpStatus.OK);
         else
             return new ResponseEntity<>("Failed to Update", HttpStatus.BAD_REQUEST);

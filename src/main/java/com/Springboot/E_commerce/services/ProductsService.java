@@ -1,48 +1,44 @@
 package com.Springboot.E_commerce.services;
 
 import com.Springboot.E_commerce.model.Product;
-import com.Springboot.E_commerce.repository.ProductRepo;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.Springboot.E_commerce.repository.IProductRepo;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 
 @Service
-public class ProductsService {
+public class ProductsService implements IProductsService {
 
-    ProductRepo repo;
-    public ProductsService(ProductRepo repo) {
+    IProductRepo repo;
+    public ProductsService(IProductRepo repo) {
         this.repo = repo;
     }
+    @Override
     public List<Product> getAllProducts() {
         return repo.findAll();
     }
 
+    @Override
     public Product getProductById(int id) {
-        return repo.findById(id).orElse(null);
+        return repo.findById(id);
     }
 
-    public Product addProduct(Product product, MultipartFile imageFile) throws IOException {
-        product.setImageName(imageFile.getOriginalFilename());
-        product.setImageType(imageFile.getContentType());
-        product.setImageData(imageFile.getBytes());
+    @Override
+    public int addProduct(Product product) {
         return repo.save(product);
     }
 
-    public Product updateProduct(int productId, Product product, MultipartFile imageFile) throws IOException {
-        product.setImageData(imageFile.getBytes());
-        product.setImageName(imageFile.getOriginalFilename());
-        product.setImageType(imageFile.getContentType());
+    @Override
+    public int updateProduct(int productId, Product product) {
+        product.setId(productId);
         return repo.save(product);
     }
 
+    @Override
     public void deleteProduct(int productId) {
         repo.deleteById(productId);
     }
 
+    @Override
     public List<Product> searchProducts(String keyword) {
         return repo.searchProduct(keyword);
     }

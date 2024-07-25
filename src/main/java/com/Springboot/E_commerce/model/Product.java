@@ -1,22 +1,18 @@
 package com.Springboot.E_commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.sql.Date;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private String desc;
@@ -27,9 +23,4 @@ public class Product {
     private Date releaseDate;
     private boolean available;
     private int quantity;
-
-    private String imageName;
-    private String imageType;
-    @Lob
-    private byte[] imageData;
 }
